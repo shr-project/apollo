@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Copyright (c) 2020 LG Electronics, Inc. All Rights Reserved
+
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
 #
@@ -16,18 +18,17 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
-
 INCHINA="no"
-LOCAL_IMAGE="no"
+LOCAL_IMAGE="yes"
 FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20190617_1100"
+VERSION_X86_64="latest"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
+
+ulimit -c 0
 
 # Check whether user has agreed license agreement
 function check_agreement() {
@@ -89,27 +90,28 @@ do
 done
 }
 
-if [ "$DEV_START__BUILD_ONLY__LGSVL" != "1" ];then
-  if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
-      sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
-  fi
+APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd -P )"
 
-  if [ -e /proc/sys/kernel ]; then
-      echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
-  fi
+# LGSVL:
+if false; then
+if [ "$(readlink -f /apollo)" != "${APOLLO_ROOT_DIR}" ]; then
+    sudo ln -snf ${APOLLO_ROOT_DIR} /apollo
+fi
+
+if [ -e /proc/sys/kernel ]; then
+    echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
+fi
 fi
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
-if [ "$DEV_START__BUILD_ONLY__LGSVL" != "1" ];then
-  check_agreement
-fi
+check_agreement
 
 VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
-  sunnyvale_big_loop
-  sunnyvale_loop
-  sunnyvale_with_two_offices
-  san_mateo
+#  sunnyvale_big_loop
+#  sunnyvale_loop
+#  sunnyvale_with_two_offices
+#  san_mateo
 )
 DEFAULT_TEST_MAPS=(
   sunnyvale_big_loop
@@ -117,6 +119,8 @@ DEFAULT_TEST_MAPS=(
 )
 MAP_VOLUME_CONF=""
 OTHER_VOLUME_CONF=""
+
+LOG_DIR_LGSVL=$APOLLO_ROOT_DIR/lgsvlsimulator-output/autopilot/log
 
 while [ $# -gt 0 ]
 do
@@ -191,16 +195,14 @@ if [ "$INCHINA" == "yes" ]; then
     DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
 fi
 
-if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
-    VERSION="local_dev"
-fi
+#if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
+#    VERSION="local_dev"
+#fi
 
-
-IMG=${DOCKER_REPO}:$VERSION
+# LGSVL:
+IMG=lgsvl/apollo-5.0-runtime:${VERSION}
 
 function local_volumes() {
-    # Apollo root dir is required.
-    volumes="-v $APOLLO_ROOT_DIR:/apollo"
     case "$(uname -s)" in
         Linux)
             volumes="${volumes} -v /dev:/dev \
@@ -211,10 +213,18 @@ function local_volumes() {
                                 -v /lib/modules:/lib/modules"
             ;;
     esac
-    echo "${volumes}"
+    # LGSVL:
+    # echo "${volumes}"
+    echo \
+        -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+        -v /etc/localtime:/etc/localtime:ro \
+        -v $LOG_DIR_LGSVL:/apollo/data/log:rw
+
 }
 
 function main(){
+    # LGSVL:
+    set -x
 
     if [ "$LOCAL_IMAGE" = "yes" ];then
         info "Start docker container based on local image : $IMG"
@@ -227,17 +237,16 @@ function main(){
         fi
     fi
 
-    APOLLO_DEV="apollo_dev_${USER}"
+    # LGSVL:
+    APOLLO_DEV="apollo_runtime_${USER}"
     docker ps -a --format "{{.Names}}" | grep "$APOLLO_DEV" 1>/dev/null
     if [ $? == 0 ]; then
-        if [[ "$(docker inspect --format='{{.Config.Image}}' $APOLLO_DEV 2> /dev/null)" != "$APOLLO_DEV_IMAGE" ]]; then
-            rm -rf $APOLLO_ROOT_DIR/bazel-*
-            rm -rf ${CACHE_ROOT_DIR}/bazel/*
-        fi
         docker stop $APOLLO_DEV 1>/dev/null
         docker rm -v -f $APOLLO_DEV 1>/dev/null
     fi
 
+    # LGSVL:
+    if false; then
     if [ "$FAST_BUILD_MODE" == "no" ]; then
         if [ "$FAST_TEST_MODE" == "no" ]; then
             # Included default maps.
@@ -284,6 +293,7 @@ function main(){
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} "
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${PADDLE_VOLUME}"
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCAL_THIRD_PARTY_VOLUME}"
+    fi
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
@@ -292,36 +302,47 @@ function main(){
         display="${DISPLAY}"
     fi
 
-    if [ "$DEV_START__BUILD_ONLY__LGSVL" != "1" ];then
-        setup_device
-    fi
+    # LGSVL:
+    # setup_device
 
     USER_ID=$(id -u)
-    GRP=$(id -g -n)
+    GRP=apollo
     GRP_ID=$(id -g)
     LOCAL_HOST=`hostname`
     DOCKER_HOME="/home/$USER"
     if [ "$USER" == "root" ];then
         DOCKER_HOME="/root"
     fi
-    if [ ! -d "${CACHE_ROOT_DIR}" ]; then
-        mkdir "${CACHE_ROOT_DIR}"
+    if [ ! -d "$HOME/.cache" ];then
+        mkdir "$HOME/.cache"
     fi
+
+    mkdir -p $LOG_DIR_LGSVL
 
     info "Starting docker container \"${APOLLO_DEV}\" ..."
 
-    DOCKER_CMD="nvidia-docker"
-    USE_GPU=1
-    if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
+    DOCKER_VERSION=$(docker version --format '{{.Client.Version}}' | cut -d'.' -f1)
+
+    if [[ $DOCKER_VERSION -ge "19" ]] && ! which nvidia-docker > /dev/null; then
         DOCKER_CMD="docker"
-        USE_GPU=0
+        USE_GPU=1
+        GPUS="--gpus all"
+    else
+        DOCKER_CMD="nvidia-docker"
+        USE_GPU=1
+        GPUS=""
     fi
 
     set -x
 
+    # LGSVL:
+    MAP_VOLUME_CONF=""
+    OTHER_VOLUME_CONF=""
+
+    # LGSVL: Removed --privileged, --shm-size 2G, --pid=host, -v /dev/null:/dev/raw1394; changed --add-host, --hostname
     ${DOCKER_CMD} run -it \
         -d \
-        --privileged \
+        ${GPUS} \
         --name $APOLLO_DEV \
         ${MAP_VOLUME_CONF} \
         ${OTHER_VOLUME_CONF} \
@@ -336,12 +357,9 @@ function main(){
         $(local_volumes) \
         --net host \
         -w /apollo \
-        --add-host in_dev_docker:127.0.0.1 \
+        --add-host in_runtime_docker:127.0.0.1 \
         --add-host ${LOCAL_HOST}:127.0.0.1 \
-        --hostname in_dev_docker \
-        --shm-size 2G \
-        --pid=host \
-        -v /dev/null:/dev/raw1394 \
+        --hostname in_runtime_docker \
         $IMG \
         /bin/bash
     set +x
@@ -354,7 +372,8 @@ function main(){
         docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
-    ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
+    # LGSVL:
+    ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/runtime_into.sh"
     ok "Enjoy!"
 }
 
