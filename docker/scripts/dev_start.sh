@@ -262,7 +262,9 @@ function setup_devices_and_mount_local_volumes() {
     [ -d "${CACHE_ROOT_DIR}" ] || mkdir -p "${CACHE_ROOT_DIR}"
 
     source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh" CYBER_ONLY
-    setup_device
+    if [ "$DEV_START__BUILD_ONLY__LGSVL" != "1" ];then
+        setup_device
+    fi
 
     local volumes="-v $APOLLO_ROOT_DIR:/apollo"
     local teleop="${APOLLO_ROOT_DIR}/../apollo-teleop"
@@ -453,7 +455,9 @@ function main() {
     check_target_arch
 
     parse_arguments "$@"
-    check_agreement
+    if [ "$DEV_START__BUILD_ONLY__LGSVL" != "1" ];then
+        check_agreement
+    fi
 
     determine_dev_image "${USER_VERSION_OPT}"
     geo_specific_config "${GEOLOC}"
