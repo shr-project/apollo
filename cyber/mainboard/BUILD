@@ -15,7 +15,7 @@ cc_binary(
     linkopts = ["-pthread"],
     linkstatic = False,
     deps = [
-        "//cyber:cyber_core",
+        "//cyber:cyber",
         "//cyber/proto:dag_conf_cc_proto",
     ],
 )
