@@ -120,6 +120,8 @@ function determine_build_targets() {
       else
         build_targets="//cyber/..."
       fi
+    elif [[ "${component}" == "dist" ]]; then
+      build_targets="//dist/..."
     elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
       build_targets="//modules/${component}/..."
     else
