@@ -63,16 +63,16 @@ docker cp apollo_localization_volume_$USER:/usr/local/apollo/local_integ - | doc
 docker cp apollo_yolov4_volume_$USER:/apollo/modules/perception/camera/lib/obstacle/detector/yolov4/model - | docker cp -a - apollo_runtime_$USER:/apollo/modules/perception/camera/lib/obstacle/detector/yolov4
 
 # apolloauto/apollo:map_volume-san_mateo-latest
-docker cp apollo_map_volume-san_mateo_$USER:/apollo/modules/map/data/san_mateo - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
+#docker cp apollo_map_volume-san_mateo_$USER:/apollo/modules/map/data/san_mateo - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
 
 # apolloauto/apollo:map_volume-sunnyvale_with_two_offices-latest
-docker cp apollo_map_volume-sunnyvale_with_two_offices_$USER:/apollo/modules/map/data/sunnyvale_with_two_offices - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
+#docker cp apollo_map_volume-sunnyvale_with_two_offices_$USER:/apollo/modules/map/data/sunnyvale_with_two_offices - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
 
 # apolloauto/apollo:map_volume-sunnyvale_loop-latest
-docker cp apollo_map_volume-sunnyvale_loop_$USER:/apollo/modules/map/data/sunnyvale_loop - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
+#docker cp apollo_map_volume-sunnyvale_loop_$USER:/apollo/modules/map/data/sunnyvale_loop - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
 
 # apolloauto/apollo:map_volume-sunnyvale_big_loop-latest
-docker cp apollo_map_volume-sunnyvale_big_loop_$USER:/apollo/modules/map/data/sunnyvale_big_loop - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
+#docker cp apollo_map_volume-sunnyvale_big_loop_$USER:/apollo/modules/map/data/sunnyvale_big_loop - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
 
 docker exec apollo_runtime_$USER ldconfig
 
