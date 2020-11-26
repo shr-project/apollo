@@ -315,7 +315,7 @@ a.docker进不去, no matching entries in passwd file
  `sudo usermod -aG docker $USER` 
 
  其中$USER是登陆用户名，执行成功后logout，然后重新登陆ubuntu。
- 如果没有解决，那么有可能是/apollo/scripts/docker_adduser.sh没有权限，需要`sudo chmod a+rx /apollo/scripts/docker_adduser.sh`增加权限。（ 我们曾遇到一种情况就是/apollo/scripts/目录下有一个docker_adduser.sh~文件，导致报错，所以需要检查是否存在副本文件或者交换文件之类的，需要删除掉 ）。
+ 如果没有解决，那么有可能是/apollo/scripts/docker_start_user.sh没有权限，需要`sudo chmod a+rx /apollo/scripts/docker_start_user.sh`增加权限。（ 我们曾遇到一种情况就是/apollo/scripts/目录下有一个docker_start_user.sh~文件，导致报错，所以需要检查是否存在副本文件或者交换文件之类的，需要删除掉 ）。
 如果还是不行，可以试试`sudo chmod 777 /var/run/docker.sock docker/scripts`。
 
 b.编译的时候CAN警告

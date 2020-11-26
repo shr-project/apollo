@@ -359,7 +359,7 @@ function main(){
     fi
 
     if [ "${USER}" != "root" ]; then
-        docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
+        docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_start_user.sh'
     fi
 
     # LGSVL:
