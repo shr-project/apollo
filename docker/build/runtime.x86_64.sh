@@ -19,11 +19,11 @@ if ! docker exec -u $USER -t apollo_dev_$USER ls /apollo/.cache/bazel >/dev/null
   exit 1
 fi
 
-docker build -f docker/build/runtime.x86_64.dockerfile docker/build/ -t lgsvl/apollo-6.0-runtime
+docker build -f docker/build/runtime.x86_64.dockerfile docker/build/ -t lgsvl/apollo-master-runtime
 
 docker stop apollo_runtime_$USER || true
 docker rm apollo_runtime_$USER || true
-docker run -it -d --name apollo_runtime_$USER lgsvl/apollo-6.0-runtime /bin/bash
+docker run -it -d --name apollo_runtime_$USER lgsvl/apollo-master-runtime /bin/bash
 docker commit -m "Without prebuilt files" apollo_runtime_$USER
 
 # Copy apollo repository
@@ -77,7 +77,7 @@ docker cp apollo_yolov4_volume_$USER:/apollo/modules/perception/camera/lib/obsta
 docker exec apollo_runtime_$USER ldconfig
 
 cat <<! > image-info-lgsvl.source
-IMAGE_APP=apollo-6.0
+IMAGE_APP=apollo-master
 IMAGE_CREATED_BY=runtime.x86_64.sh
 IMAGE_CREATED_FROM=$(git describe --tags --always)
 IMAGE_CREATED_ON=$(date --iso-8601=seconds --utc)
@@ -96,9 +96,9 @@ rm -f image-info-lgsvl.source
 docker exec -e DOCKER_GRP_ID=1001 -e DOCKER_USER_ID=1001 -e DOCKER_USER=apollo -e DOCKER_GRP=apollo apollo_runtime_$USER /apollo/scripts/docker_start_user.sh || true
 docker exec apollo_runtime_$USER chown -R apollo:apollo /apollo
 
-docker commit -m "With prebuilt files" apollo_runtime_$USER lgsvl/apollo-6.0-runtime:latest
+docker commit -m "With prebuilt files" apollo_runtime_$USER lgsvl/apollo-master-runtime:latest
 
-/bin/echo -e "Docker image with prebuilt files was built and tagged as lgsvl/apollo-6.0-runtime:latest, you can start it with: \n\
+/bin/echo -e "Docker image with prebuilt files was built and tagged as lgsvl/apollo-master-runtime:latest, you can start it with: \n\
   docker/scripts/runtime_start.sh\n\
 and switch into it with:\n\
   docker/scripts/runtime_into.sh"
