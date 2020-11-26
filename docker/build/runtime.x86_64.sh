@@ -37,25 +37,42 @@ rm -f docker/build/installers/install_apollo_files.txt.tmp
 
 # Copy in the contents of the mounted volumes.
 # dev container contains following volumes:
-# apolloauto/apollo           yolo3d_volume-x86_64-latest                    6a9cbf71163e        2 years ago         275MB
-# apolloauto/apollo           localization_volume-x86_64-latest              109001137d4a        15 months ago       5.44MB
-# apolloauto/apollo           paddlepaddle_volume-x86_64-latest              1f96e81c6a99        15 months ago       804MB
-# apolloauto/apollo           local_third_party_volume-x86_64-latest         5df2bf3cc4b9        16 months ago       156MB
+# apolloauto/apollo           faster_rcnn_volume-traffic_light_detection_model-latest          58537bb25841        2 months ago        170MB
+# apolloauto/apollo           yolov4_volume-emergency_detection_model-latest                   e3e249ea7a8a        2 months ago        264MB
+# apolloauto/apollo           localization_volume-x86_64-latest                                109001137d4a        17 months ago       5.44MB
+# apolloauto/apollo           data_volume-audio_model-x86_64-latest                            17cb2a72a392        2 months ago        194MB
+# apolloauto/apollo           map_volume-san_mateo-latest                                      48cd73de58ba        13 months ago       202MB
+# apolloauto/apollo           map_volume-sunnyvale_with_two_offices-latest                     93a347cea6a0        8 months ago        509MB
+# apolloauto/apollo           map_volume-sunnyvale_big_loop-latest                             e7b1a71d5b9d        8 days ago          440MB
+# apolloauto/apollo           map_volume-sunnyvale_loop-latest                                 36dc0d1c2551        2 years ago         906MB
+# apolloauto/apollo           local_third_party_volume-x86_64-latest                           5df2bf3cc4b9        17 months ago       156MB
 
 # apolloauto/apollo:local_third_party_volume-x86_64-latest
 docker cp apollo_local_third_party_volume_$USER:/usr/local/apollo/local_third_party - | docker cp -a - apollo_runtime_$USER:/usr/local/apollo
 
-# apolloauto/apollo:paddlepaddle_volume-x86_64-latest
-docker cp apollo_paddlepaddle_volume_$USER:/usr/local/apollo/paddlepaddle - | docker cp -a - apollo_runtime_$USER:/usr/local/apollo
-docker cp apollo_paddlepaddle_volume_$USER:/usr/local/apollo/paddlepaddle_dep - | docker cp -a - apollo_runtime_$USER:/usr/local/apollo
+# apolloauto/apollo:data_volume-audio_model-x86_64-latest
+docker cp apollo_audio_volume_$USER:/apollo/modules/audio/data - | docker cp -a - apollo_runtime_$USER:/apollo/modules/audio/
+
+# apolloauto/apollo:faster_rcnn_volume-traffic_light_detection_model-latest
+docker cp apollo_faster_rcnn_volume_$USER:/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection/faster_rcnn_model - | docker cp -a - apollo_runtime_$USER:/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection
 
 # apolloauto/apollo:localization_volume-x86_64-latest
 docker cp apollo_localization_volume_$USER:/usr/local/apollo/local_integ - | docker cp -a - apollo_runtime_$USER:/usr/local/apollo
 
-# apolloauto/apollo:yolo3d_volume-x86_64-latest
-docker cp apollo_yolo3d_volume_$USER:/apollo/modules/perception/model/yolo_camera_detector/lane13d_0716 - | docker cp -a - apollo_runtime_$USER:/apollo/modules/perception/model/yolo_camera_detector
-docker cp apollo_yolo3d_volume_$USER:/apollo/modules/perception/model/yolo_camera_detector/lane2d_0627 - | docker cp -a - apollo_runtime_$USER:/apollo/modules/perception/model/yolo_camera_detector
-docker cp apollo_yolo3d_volume_$USER:/apollo/modules/perception/model/yolo_camera_detector/yolo3d_1128 - | docker cp -a - apollo_runtime_$USER:/apollo/modules/perception/model/yolo_camera_detector
+# apolloauto/apollo:yolov4_volume-emergency_detection_model-latest
+docker cp apollo_yolov4_volume_$USER:/apollo/modules/perception/camera/lib/obstacle/detector/yolov4/model - | docker cp -a - apollo_runtime_$USER:/apollo/modules/perception/camera/lib/obstacle/detector/yolov4
+
+# apolloauto/apollo:map_volume-san_mateo-latest
+docker cp apollo_map_volume-san_mateo_$USER:/apollo/modules/map/data/san_mateo - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
+
+# apolloauto/apollo:map_volume-sunnyvale_with_two_offices-latest
+docker cp apollo_map_volume-sunnyvale_with_two_offices_$USER:/apollo/modules/map/data/sunnyvale_with_two_offices - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
+
+# apolloauto/apollo:map_volume-sunnyvale_loop-latest
+docker cp apollo_map_volume-sunnyvale_loop_$USER:/apollo/modules/map/data/sunnyvale_loop - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
+
+# apolloauto/apollo:map_volume-sunnyvale_big_loop-latest
+docker cp apollo_map_volume-sunnyvale_big_loop_$USER:/apollo/modules/map/data/sunnyvale_big_loop - | docker cp -a - apollo_runtime_$USER:/apollo/modules/map/data
 
 docker exec apollo_runtime_$USER ldconfig
 
