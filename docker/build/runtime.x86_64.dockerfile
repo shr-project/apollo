@@ -32,29 +32,13 @@ RUN apt-get update && \
     --no-install-recommends \
     libx11-6 \
     libgomp1 \
-    libopenmpi1.6 \
     libopenblas-base \
-    libopencv-core2.4 \
-    libboost-system1.54.0 \
-    libboost-signals1.54.0 \
-    libboost-thread1.54.0 \
-    libpocofoundation9 \
     libatomic1 \
     python \
     curl \
-    libopencv-highgui2.4 \
-    libboost-filesystem1.54.0 \
-    libboost-iostreams1.54.0 \
-    libboost-chrono1.54.0 \
-    libvtk5.8 \
     libpcap0.8 \
-    libqhull6 \
-    libsnappy1 \
     ocl-icd-libopencl1 \
-    libboost-program-options1.54.0 \
     libatlas3-base \
-    cuda-command-line-tools-8-0 \
-    libvtk5.8-qt4 \
     libpython2.7 \
     liblapack3 \
     python3-psutil \
@@ -62,19 +46,6 @@ RUN apt-get update && \
     libxcb-shape0 \
     libxcb-xfixes0 \
     && rm -rf /var/lib/apt/lists/*
-
-COPY --from=nvidia/opengl:1.1-glvnd-runtime-ubuntu14.04 \
- /usr/local/lib/x86_64-linux-gnu \
- /usr/local/lib/x86_64-linux-gnu
-
-COPY --from=nvidia/opengl:1.1-glvnd-runtime-ubuntu14.04 \
- /usr/local/share/glvnd/egl_vendor.d/10_nvidia.json \
- /usr/local/share/glvnd/egl_vendor.d/10_nvidia.json
-
-RUN echo '/usr/local/lib/x86_64-linux-gnu' >> /etc/ld.so.conf.d/glvnd.conf && \
- ldconfig && \
- echo '/usr/local/$LIB/libGL.so.1' >> /etc/ld.so.preload && \
- echo '/usr/local/$LIB/libEGL.so.1' >> /etc/ld.so.preload
 
 # nvidia-container-runtime
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
