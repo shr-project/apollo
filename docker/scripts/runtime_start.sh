@@ -198,7 +198,7 @@ fi
 #fi
 
 # LGSVL:
-IMG=lgsvl/apollo-5.0-runtime:${VERSION}
+IMG=lgsvl/apollo-6.0-runtime:${VERSION}
 
 function local_volumes() {
     case "$(uname -s)" in
