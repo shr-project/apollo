@@ -93,7 +93,7 @@ rm -f image-info-lgsvl.source
 # This was used to be called from docker/scripts/dev_start.sh (or docker/scripts/runtime_start.sh),
 # but we want the container to be as ready to use as possible out of the registry and we don't use
 # $HOME/.cache anymore, so different UID in container shouldn't cause (m)any issues
-docker exec -e DOCKER_GRP_ID=1001 -e DOCKER_USER_ID=1001 -e DOCKER_USER=apollo -e DOCKER_GRP=apollo apollo_runtime_$USER /apollo/scripts/docker_adduser.sh
+docker exec -e DOCKER_GRP_ID=1001 -e DOCKER_USER_ID=1001 -e DOCKER_USER=apollo -e DOCKER_GRP=apollo apollo_runtime_$USER /apollo/scripts/docker_start_user.sh || true
 docker exec apollo_runtime_$USER chown -R apollo:apollo /apollo
 
 docker commit -m "With prebuilt files" apollo_runtime_$USER lgsvl/apollo-6.0-runtime:latest
