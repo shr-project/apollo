@@ -29,7 +29,7 @@ docker commit -m "Without prebuilt files" apollo_runtime_$USER
 # Copy apollo repository
 docker exec apollo_runtime_$USER mkdir /apollo
 docker exec apollo_runtime_$USER mkdir /usr/local/apollo
-tar -cf - --exclude ./.cache/bazel/install --exclude=./modules/map/data/* --exclude=./data/log/* --exclude=**/.git --exclude=**/_objs --exclude=**/*.a --exclude=./lgsvlsimulator-output . | docker cp -a - apollo_runtime_$USER:/apollo
+tar -cf - --exclude ./.cache/bazel/install --exclude ./.cache/bazel/cache --exclude ./.cache/build --exclude ./.cache/distdir --exclude ./.cache/repos --exclude=./modules/map/data/* --exclude=./data/log/* --exclude=**/.git --exclude=**/_objs --exclude=**/*.a --exclude=./lgsvlsimulator-output . | docker cp -a - apollo_runtime_$USER:/apollo
 
 grep -v ^# docker/build/installers/install_apollo_files.txt > docker/build/installers/install_apollo_files.txt.tmp
 docker exec apollo_dev_$USER sh -c 'tar -C / -cf - --files-from=/apollo/docker/build/installers/install_apollo_files.txt.tmp' | docker cp -a - apollo_runtime_$USER:/
